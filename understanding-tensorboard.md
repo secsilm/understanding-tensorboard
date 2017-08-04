@@ -49,7 +49,7 @@ eval_writer = tf.summary.FileWriter(LOGDIR + '/eval')
 eval_writer.add_summary(tf.Summary(value=[tf.Summary.Value(tag='eval_accuracy', simple_value=np.mean(test_acc))]), i)
 ```
 
-这里我是手动添加了一个验证准确率到 `SCALARS` 中，其实想要记录验证准确率完全不必这么做，和训练准确率不同的只是 feed 的数据不一样而已。然而由于我的显存不够一次装下整个验证集，所以我就分了两部分计算然后求平均值来得到整个验证集的准确率。*如果谁有更好的方法，请给我发邮件或者在评论区评论，非常感谢:-)*
+这里我是手动添加了一个验证准确率到 `SCALARS` 中，其实想要记录验证准确率完全不必这么做，和训练准确率不同的只是 feed 的数据不一样而已。然而由于我的显存不够一次装下整个验证集，所以我就分了两部分计算然后求平均值来得到整个验证集的准确率。*如果谁有更好的方法，请给我发邮件或者在评论区评论，非常感谢 :-)*
 
 ## IMAGES
 
