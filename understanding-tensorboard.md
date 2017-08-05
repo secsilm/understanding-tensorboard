@@ -73,10 +73,22 @@ eval_writer.add_summary(tf.Summary(value=[tf.Summary.Value(tag='eval_accuracy', 
 
 ## IMAGES
 
-如果你的模型输入是图像（的像素值），然后你想看看模型每次的输入图像是什么样的，以保证每次输入的图像没有问题（因为你可能在模型中对图像做了某种变换，而这种变换是很容易出问题的），`IMAGES` 面板就是干这个的，它可以显示出相应的输入图像，如下图：
+如果你的模型输入是图像（的像素值），然后你想看看模型每次的输入图像是什么样的，以保证每次输入的图像没有问题（因为你可能在模型中对图像做了某种变换，而这种变换是很容易出问题的），`IMAGES` 面板就是干这个的，它可以显示出相应的输入图像，默认显示最新的输入图像，如下图：
 
-左侧
+图的右下角的两个图标，第一个是查看大图，第二个是查看原图（真实大小，默认显示的是放大后的）。左侧和 `SCALARS` 差不多，我就不赘述了。
 
+而在代码中，需要在合适的位置使用 [`tf.summary.image()`](https://www.tensorflow.org/api_docs/python/tf/summary/image) 来把图像记录到文件中，其参数和 `tf.summary.scalar()` 大致相同，多了一个 `max_outputs` ，指的是最多显示多少张图片，默认为 3。对应于我的代码，如下：
+
+```python
+x = tf.placeholder(tf.float32, shape=[None, N_FEATURES], name='x')
+x_image = tf.transpose(tf.reshape(x, [-1, 3, 32, 32]), perm=[0, 2, 3, 1])
+tf.summary.image('input', x_image, max_outputs=3)
+y = tf.placeholder(tf.float32, [None, N_CLASSES], name='labels')
+```
+
+## GRAPHS
+
+这个应该是最常用的面板了。很多时候我们的模型很复杂，包含很多层，我们想要总体上看下构建的网络到底是什么样的，这时候就用到 `GRAPHS` 面板了。
 ## DISTRIBUTIONS
 
 ## HISTOGRAMS
