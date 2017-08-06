@@ -10,6 +10,8 @@
 
 其中 `TEXT` 是 最新版（应该是 1.3）才加进去的，实验性功能，官方都没怎么介绍。除了 `AUDIO`（没用过）、`EMBEDDINGS`（还不是很熟） 和 `TEXT`（没用过） 这几个，这篇博客主要说剩下的几个，其他的等回头熟练了再来说，尽量避免误人子弟。
 
+TensorBoard 的工作原理是读取模型训练时产生的 TensorFlow events 文件，这个文件包括了一些 summary 数据（就是作图时用的数据）。
+
 ## SCALARS
 
 `SCALARS` 主要用于记录诸如准确率、损失和学习率等单个值的变化趋势。在代码中用 [`tf.summary.scalar()`](https://www.tensorflow.org/api_docs/python/tf/summary/scalar) 来将其记录到文件中。对应于我的代码中，我是使用其记录了训练准确率和损失。
