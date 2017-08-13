@@ -2,7 +2,19 @@
 
 [TensorBoard](https://www.tensorflow.org/get_started/summaries_and_tensorboard) 是用于可视化 TensorFlow 模型的训练过程的工具（the flow of tensors），在你安装 TensorFlow 的时候就已经安装了 TensorBoard。我在前面的 [【TensorFlow】TensorFlow 的卷积神经网络 CNN - TensorBoard版](http://blog.csdn.net/u010099080/article/details/62882006) 和 [【Python | TensorBoard】用 PCA 可视化 MNIST 手写数字识别数据集](http://blog.csdn.net/u010099080/article/details/53560426) 分别非常简单的介绍了一下这个工具，没有详细说明，这次来（尽可能详细的）整体说一下，而且这次也是对 [前者](http://blog.csdn.net/u010099080/article/details/62882006) 代码的一个升级，很大程度的改变了代码结构，将输入和训练分离开来，结构更清晰。小弟不才，如有错误，欢迎评论区指出。
 
-# OVERVIEW
+## TensorBoard 是如何工作的？
+
+简单来说，TensorBoard 是通过一些操作（summary operations）将数据记录到文件（event files）中，然后再读取文件来完成作图的。想要在浏览器上看到 TensorBoard 页面，大概需要这几步：
+
+1. **summary**。在定义计算图的时候，在适当的位置加上一些 [summary 操作](https://www.tensorflow.org/api_guides/python/summary) 。
+2. **merge**。你很可能加了很多 summary 操作，我们需要使用 `tf.summary.merge_all` 来将这些 summary 操作聚合成一个操作，由它来产生所有 summary 数据。
+3. **run**。在没有运行的时候这些操作是不会执行任何东西的，仅仅是定义了一下而已。在运行（开始训练）的时候，我们需要通过 `tf.summary.FileWriter()` 指定一个目录来告诉程序把产生的文件放到哪。然后在运行的时候使用 `add_summary()` 来将某一步的 summary 数据记录到文件中。
+
+当训练完成后，在命令行使用 `tensorboard --logdir=path/to/log-directory` 来启动 TensorBoard，按照提示在浏览器打开页面，注意把 `path/to/log-directory` 替换成你上面指定的目录。
+
+![tensorboard]()
+
+## OVERVIEW
 
 总体上，目前 TensorBoard 主要包括下面几个面板：
 
