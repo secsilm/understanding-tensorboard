@@ -41,13 +41,13 @@ def merge_data(dataset_dir, onehot_encoding=False):
     eval_images = unpickle(os.path.join(dataset_dir, EVAL_FILE[0]))['data']
     eval_labels = unpickle(os.path.join(dataset_dir, EVAL_FILE[0]))['labels']
     # 训练集
-    for i in range(2, len(TRAIN_FILE) + 1):
-        batch = unpickle(os.path.join(dataset_dir, TRAIN_FILE[i - 1]))
+    for i in range(1, len(TRAIN_FILE)):
+        batch = unpickle(os.path.join(dataset_dir, TRAIN_FILE[i]))
         train_images = np.concatenate((train_images, batch['data']), axis=0)
         train_labels = np.concatenate((train_labels, batch['labels']), axis=0)
     # 验证集
-    for i in range(2, len(EVAL_FILE) + 1):
-        batch = unpickle(os.path.join(dataset_dir, TRAIN_FILE[i - 1]))
+    for i in range(1, len(EVAL_FILE)):
+        batch = unpickle(os.path.join(dataset_dir, TRAIN_FILE[i]))
         eval_images = np.concatenate((eval_images, batch['data']), axis=0)
         eval_labels = np.concatenate((eval_labels, batch['labels']), axis=0)
     if onehot_encoding:
