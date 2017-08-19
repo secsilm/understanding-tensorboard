@@ -102,17 +102,53 @@ y = tf.placeholder(tf.float32, [None, N_CLASSES], name='labels')
 
 ## GRAPHS
 
-这个应该是最常用的面板了。很多时候我们的模型很复杂，包含很多层，我们想要总体上看下构建的网络到底是什么样的，这时候就用到 `GRAPHS` 面板了，在这里可以展示出你所构建的网络整体结构，显示数据流的方向和大小，也可以显示训练时每个节点的用时、耗费的内存大小以及参数多少。默认显示的图分为两部分：主图（Main Graph）和辅助节点（Auxiliary Nodes）。其中主图显示的就是网络结构，辅助节点则显示的是初始化、训练、保存等节点。我们可以单击某个节点来展开查看里面的情况，也可以对齐进行缩放，每个节点的命名都是我们在代码中使用 `tf.name_scope()` 定义好的。下面介绍下该面板左侧的功能。
+这个应该是最常用的面板了。很多时候我们的模型很复杂，包含很多层，我们想要总体上看下构建的网络到底是什么样的，这时候就用到 `GRAPHS` 面板了，在这里可以展示出你所构建的网络整体结构，显示数据流的方向和大小，也可以显示训练时每个节点的用时、耗费的内存大小以及参数多少。默认显示的图分为两部分：主图（Main Graph）和辅助节点（Auxiliary Nodes）。其中主图显示的就是网络结构，辅助节点则显示的是初始化、训练、保存等节点。我们可以双击某个节点或者点击节点右上角的 `+` 来展开查看里面的情况，也可以对齐进行缩放，每个节点的命名都是我们在代码中使用 `tf.name_scope()` 定义好的。下面介绍下该面板左侧的功能。
 
 ![graph]()
 
-左上是 `Fit to screen`，顾名思义就是将图缩放到适合屏幕。下面的 `Download PNG` 则是将图保存到本地。`Run` 和 `Session Run` 分别是不同的训练和迭代步数。比如我这里以不同的超参训练了 6 次，那么 就有 6 个 run，而你所记录的迭代次数（并不是每一步都会记录当前状态的，那样的话太多了，一般都是每隔多少次记录一次）则显示在 `Session Run` 里。
+左上是 `Fit to screen`，顾名思义就是将图缩放到适合屏幕。下面的 `Download PNG` 则是将图保存到本地。`Run` 和 `Session Run` 分别是不同的训练和迭代步数。比如我这里以不同的超参训练了 6 次，那么 就有 6 个 run，而你所记录的迭代次数（并不是每一步都会记录当前状态的，那样的话太多了，一般都是每隔多少次记录一次）则显示在 `Session Run` 里。再下面大家应该都能看懂，我就不详细说每个功能的意思了。
 
 ![run]()
 
+TensorBoard 默认是不会记录每个节点的用时、耗费的内存大小等这些信息的，那么如何才能在图上显示这些信息呢？关键就是如下这些代码，主要就是在 `sess.run()` 中加入 `options` 和 `run_metadata` 参数。
+
+```python
+run_options = tf.RunOptions(trace_level=tf.RunOptions.FULL_TRACE)
+run_metadata = tf.RunMetadata()
+s, lss, acc , _ = sess.run([merged_summary, loss, accuracy, train_step], 
+                           feed_dict={x: batch_x, y: batch_y, phase: 1},
+                           options=run_options,
+                           run_metadata=run_metadata)
+summary_writer.add_run_metadata(run_metadata, 'step{}'.format(i))
+summary_writer.add_summary(s, i)
+```
+
+然后我们就可以选择 `Compute time` 或者 `Memory` 来查看相应信息，颜色深浅代表耗时多少或者内存耗用多少。
+
+![compute-time-memory]()
+
+我们也可以将某个节点从主图移除，将其放到辅助节点中，以便于我们更清晰的观察整个网络。具体操作是 *右键该节点，选择 `Remove from main graph`* 。
 
 ## DISTRIBUTIONS
 
+`DISTRIBUTIONS` 主要用来展示网络中各参数随训练步数的增加的变化情况，可以说是 *多分位数折线图* 的堆叠。下面我就下面这张图来解释下。
+
+![conv1-weights]()
+
+这张图表示的是第二个卷积层的权重变化。横轴表示训练步数，纵轴表示权重值。而从上到下的折现分别表示权重分布的不同分位数。
+
 ## HISTOGRAMS
 
-## TODO
+**`HISTOGRAMS` 和 `DISTRIBUTIONS` 是对同一数据不同方式的展现**。与 `DISTRIBUTIONS` 不同的是，`HISTOGRAMS` 可以说是 *频数分布直方图* 的堆叠。横轴表示权重值，纵轴表示训练步数。颜色越深表示时间越早，越浅表示时间越晚（越接近训练结束）。除此之外，`HISTOGRAMS` 还有个 `Histogram mode`，有两个选项：`OVERLAY` 和 `OFFSET`。选择 `OVERLAY` 时横轴为权重值，纵轴为频数，每一条折线为训练步数。颜色深浅与上面同理。默认为 `OFFSET` 模式。
+
+## 后记
+
+这篇博文写了好久，从准备数据到开始动笔写，中间一直被各种事干扰。由于我水平有限，我只能尽最大程度的给出尽可能正确的解释，然而还有很多我目前还兼顾不到，很多话也不是很通顺。如有错误，欢迎在评论区或者给我私信或者给我邮件指出。
+
+## REFERENCE
+
+- [How does one interpret histograms given by TensorFlow in TensorBoard?](https://stats.stackexchange.com/questions/220491/how-does-one-interpret-histograms-given-by-tensorflow-in-tensorboard)
+- [TensorBoard Histogram Dashboard](https://www.tensorflow.org/get_started/tensorboard_histograms)
+- [Understanding TensorBoard (weight) histograms](https://stackoverflow.com/questions/42315202/understanding-tensorboard-weight-histograms)
+
+## END
