@@ -145,7 +145,19 @@ summary_writer.add_summary(s, i)
 
 ![conv1-weights](https://i.imgur.com/UIrCsl9.png)
 
-这张图表示的是第二个卷积层的权重变化。横轴表示训练步数，纵轴表示权重值。而从上到下的折现分别表示权重分布的不同分位数。
+这张图表示的是第二个卷积层的权重变化。横轴表示训练步数，纵轴表示权重值。而从上到下的折现分别表示权重分布的不同分位数。对应于我的代码，部分如下：
+
+```python
+with tf.name_scope(name):
+    W = tf.Variable(tf.truncated_normal(
+        [k, k, channels_in, channels_out], stddev=0.1), name='W')
+    b = tf.Variable(tf.constant(0.1, shape=[channels_out]), name='b')
+    conv = tf.nn.conv2d(inpt, W, strides=[1, s, s, 1], padding='SAME')
+    act = tf.nn.relu(conv)
+    tf.summary.histogram('weights', W)
+    tf.summary.histogram('biases', b)
+    tf.summary.histogram('activations', act)
+```
 
 ## HISTOGRAMS
 
