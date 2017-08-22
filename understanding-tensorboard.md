@@ -67,7 +67,7 @@ with tf.name_scope('loss'):
 
 每个图的右下角都有 3 个小图标，第一个是查看大图，第二个是是否对 y 轴对数化，第三个是如果你拖动或者缩放了坐标轴，再重新回到原始位置。
 
-![](http://i.imgur.com/jPNysqZ.gifv)
+![](http://i.imgur.com/jPNysqZ.gif)
 *Fit domain to data*
 
 `tf.summary.scalar(name, tensor)` 有两个参数：
